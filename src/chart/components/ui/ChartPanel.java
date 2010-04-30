@@ -265,16 +265,20 @@ public class ChartPanel
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
     closedHandCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
     
-    imgFileName = "HandPointingRight.png";
+//  imgFileName = "HandPointingRight.png";
+    imgFileName = "right.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
     handPointingRightCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
-    imgFileName = "HandPointingLeft.png";
+//  imgFileName = "HandPointingLeft.png";
+    imgFileName = "left.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
     handPointingLeftCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
-    imgFileName = "HandPointingUp.png";
+//  imgFileName = "HandPointingUp.png";
+    imgFileName = "up.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
     handPointingUpCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
-    imgFileName = "HandPointingDown.png";
+//  imgFileName = "HandPointingDown.png";
+    imgFileName = "down.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
     handPointingDownCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);    
       
@@ -2876,7 +2880,7 @@ public class ChartPanel
     setPreferredSize(new Dimension(w, h));
   }
 
-  public RenderedImage myCreateImage(int w, int h) 
+  public RenderedImage createChartImage(int w, int h) 
   {
     int width = w;
     int height = h;
@@ -2897,9 +2901,14 @@ public class ChartPanel
 
   public int[] genImage(File f, String ext)
   {
+    return genImage(f, ext, w, h);
+  }
+  
+  public int[] genImage(File f, String ext, int width, int height)
+  {
 //  int w = this.getWidth();
 //  int h = this.getHeight();
-    RenderedImage rendImage = myCreateImage(w, h);         
+    RenderedImage rendImage = createChartImage(width, height);         
     // Write generated image to a file
     try 
     {
@@ -2913,7 +2922,8 @@ public class ChartPanel
       e.printStackTrace();
     }
 //  return new int[] { this.getWidth(), this.getHeight() };
-    return new int[] { w, h };
+//  return new int[] { w, h };
+    return new int[] { width, height };
   }
   
   /**
