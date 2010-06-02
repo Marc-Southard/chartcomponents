@@ -136,7 +136,37 @@
    </hash>
    <hash n="oracle.jdeveloper.model.PathsConfiguration">
       <hash n="javaContentSet">
-         <list n="constituent-sets"/>
+         <list n="constituent-sets">
+            <hash>
+               <url n="content-folder-url" path="../JavaNMEAParser/src/ocss/nmea/parser/"/>
+               <list n="pattern-filters">
+                  <string v="+ocss/nmea/parser/Wind.java"/>
+                  <string v="+ocss/nmea/parser/UTCTime.java"/>
+                  <string v="+ocss/nmea/parser/UTCDate.java"/>
+                  <string v="+ocss/nmea/parser/UTC.java"/>
+                  <string v="+ocss/nmea/parser/Temperature.java"/>
+                  <string v="+ocss/nmea/parser/SVData.java"/>
+                  <string v="+ocss/nmea/parser/StringParsers.java"/>
+                  <string v="+ocss/nmea/parser/StringGenerator.java"/>
+                  <string v="+ocss/nmea/parser/Speed.java"/>
+                  <string v="+ocss/nmea/parser/SolarDate.java"/>
+                  <string v="+ocss/nmea/parser/RMC.java"/>
+                  <string v="+ocss/nmea/parser/RMB.java"/>
+                  <string v="+ocss/nmea/parser/OverGround.java"/>
+                  <string v="+ocss/nmea/parser/NMEADoubleValueHolder.java"/>
+                  <string v="+ocss/nmea/parser/GeoPos.java"/>
+                  <string v="+ocss/nmea/parser/Distance.java"/>
+                  <string v="+ocss/nmea/parser/Depth.java"/>
+                  <string v="+ocss/nmea/parser/Angle360.java"/>
+                  <string v="+ocss/nmea/parser/Angle180LR.java"/>
+                  <string v="+ocss/nmea/parser/Angle180EW.java"/>
+                  <string v="+ocss/nmea/parser/Angle180.java"/>
+               </list>
+               <list n="url-path">
+                  <url path="../JavaNMEAParser/src/"/>
+               </list>
+            </hash>
+         </list>
          <list n="pattern-filters">
             <string v="+**"/>
          </list>
