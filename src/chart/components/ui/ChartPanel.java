@@ -56,6 +56,7 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
@@ -119,7 +120,7 @@ public class ChartPanel
   
   private Color chartColor;
   private Color chartBackGround;
-  private GradientPaint backGroundGradient;
+  private transient GradientPaint backGroundGradient;
   private Color postitTextColor;
   private Color postitBGColor;
   private Color lopColor;
@@ -151,9 +152,9 @@ public class ChartPanel
   private int draggedFromY;
   private boolean dragged;
   private Rectangle draggingRectangle;
-  private ArrayList<Point> lineToDraw = null;
-  private ArrayList<ArrayList> handDrawing = null;
-  private ArrayList<GeoPoint> oneDrawing  = null;
+  private transient ArrayList<Point> lineToDraw = null;
+  private transient ArrayList<ArrayList> handDrawing = null;
+  private transient ArrayList<GeoPoint> oneDrawing  = null;
   private double east;
   private double west;
   private double north;
@@ -172,12 +173,12 @@ public class ChartPanel
   private boolean transparentGlobe     = true; // Display front part only if false
   private boolean antiTransparentGlobe = true; // Display aft part only if false
   
-  private GreatCircle gc = null;
+  private transient GreatCircle gc = null;
   private double satelliteHorizonDiameter = 0D;
   
   private double vGrid;
   private double hGrid;
-  private ChartPanelParentInterface parent;
+  private transient ChartPanelParentInterface parent;
   private double _north;
   private double _south;
   private double _east;
@@ -2573,7 +2574,10 @@ public class ChartPanel
           boolean goZoom = true;
           if (confirmDDZoom && mouseDraggedType == MOUSE_DRAG_ZOOM)
           {
-            int resp = JOptionPane.showConfirmDialog(this, 
+            JComponent jcp = this;
+            if (parent instanceof JComponent)
+              jcp = (JComponent)parent;
+            int resp = JOptionPane.showConfirmDialog(jcp, 
                                                      GnlUtilities.buildMessage("confirm-ddz", new String[] { topLeft.toString(), bottomRight.toString() }), 
                                                      "Drag & Drop zoom", 
                                                      JOptionPane.OK_CANCEL_OPTION, 
@@ -3260,6 +3264,11 @@ public class ChartPanel
   public void setMouseEdgeProximityDetectionEnabled(boolean mouseEdgeProximityDetectionEnabled)
   {
     this.mouseEdgeProximityDetectionEnabled = mouseEdgeProximityDetectionEnabled;
+  }
+
+  public boolean isMouseEdgeProximityDetectionEnabled()
+  {
+    return mouseEdgeProximityDetectionEnabled;
   }
 
   public class NotOnChartException extends Exception
