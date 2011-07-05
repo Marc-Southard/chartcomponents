@@ -23,6 +23,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.MouseMotionListener;
@@ -2304,6 +2305,100 @@ public class ChartPanel
       float alpha = 1.0f;
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
     }
+    if (fgcolor != null)
+      g.setColor(fgcolor);
+    else
+      g.setColor(c);
+    
+    for(i = 0; i < nbCr + 1; i++)
+      g.drawString(txt[i], startX + bevel + postitOffset, startY + (i * f.getSize()));
+
+    g.setColor(origin);
+  }
+
+  public void bubble(Graphics g, String s, int x, int y, Color bgcolor, Color fgcolor, Float transp)
+  {
+    int bevel = 2;
+    int postitOffset = 5;
+    
+    final int X_OFFSET = -50;
+    final int Y_OFFSET = -50;
+    
+    int startX = x + X_OFFSET;
+    int startY = y + Y_OFFSET;
+    
+    Color origin = g.getColor();
+    g.setColor(postitTextColor);
+    Font f = g.getFont();
+    int nbCr = 0;
+    int crOffset;
+    for (crOffset = 0; (crOffset = s.indexOf("\n", crOffset) + 1) > 0;)
+      nbCr++;
+
+    String txt[] = new String[nbCr + 1];
+    int i = 0;
+    crOffset = 0;
+    for (i = 0; i < nbCr; i++)
+      txt[i] = s.substring(crOffset, (crOffset = s.indexOf("\n", crOffset) + 1) - 1);
+
+    txt[i] = s.substring(crOffset);
+    int strWidth = 0;
+    for (i = 0; i < nbCr + 1; i++)
+    {
+      if (g.getFontMetrics(f).stringWidth(txt[i]) > strWidth)
+        strWidth = g.getFontMetrics(f).stringWidth(txt[i]);
+    }
+    Color c = g.getColor(); // postitTextColor
+    g.setColor(bgcolor);
+    if (g instanceof Graphics2D)
+    {
+      // Transparency
+      Graphics2D g2 = (Graphics2D)g;
+      float alpha = (transp!=null?transp.floatValue():0.3f);
+      g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+    }
+    // left or right, up or down...
+    Point topRightExtremity      = new Point(X_OFFSET + x + postitOffset + strWidth + (2 * bevel), 
+                                             Y_OFFSET + (y - f.getSize()) + 1);
+    Point bottomRightExtremity   = new Point(X_OFFSET + x + postitOffset + strWidth + (2 * bevel), 
+                                             Y_OFFSET + (nbCr + 1) * f.getSize());
+    Point bottomLeftExtremity    = new Point(X_OFFSET + x, 
+                                             Y_OFFSET + (nbCr + 1) * f.getSize());
+    
+    if (!this.getVisibleRect().contains(topRightExtremity) && !this.getVisibleRect().contains(bottomRightExtremity))   
+    {
+      // This display left
+      startX = X_OFFSET + x - strWidth - (2 * bevel) - (2 * postitOffset);
+    }
+    if (!this.getVisibleRect().contains(bottomLeftExtremity))   
+    {
+      // This display up
+  //    startY = y - ((nbCr + 1) * f.getSize());
+      startY = Y_OFFSET + y - ((nbCr) * f.getSize());
+  //    System.out.println("Up, y [" + y + "] becomes [" + startY + "]");
+    }
+    
+    g.fillRect(startX + postitOffset, 
+               (startY - f.getSize()) + 1, 
+               strWidth + (2 * bevel), 
+               (nbCr + 1) * f.getSize());
+    // La pointe
+    Polygon polygon = new Polygon(new int[] { x, 
+                                              bottomLeftExtremity.x + ((bottomRightExtremity.x - bottomLeftExtremity.x) / 2) - 10, 
+                                              bottomLeftExtremity.x + ((bottomRightExtremity.x - bottomLeftExtremity.x) / 2) + 10 },
+                                  new int[] { y, 
+                                              (((startY - f.getSize()) + 1) + (((nbCr + 1) * f.getSize()) / 2)), 
+                                              (((startY - f.getSize()) + 1) + (((nbCr + 1) * f.getSize()) / 2)) },
+                                  3);
+    g.fillPolygon(polygon);
+    if (g instanceof Graphics2D)
+    {
+      // Reset Transparency
+      Graphics2D g2 = (Graphics2D)g;
+      float alpha = 1.0f;
+      g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+    }
+    
     if (fgcolor != null)
       g.setColor(fgcolor);
     else
