@@ -57,6 +57,7 @@ public class CommandPanel
   private JButton printButton;
   private JSlider zoomSlider;
   private JTextField zoomValueFld;
+  private final static DecimalFormat DF22 = new DecimalFormat("#0.00");
   private JLabel label = new JLabel("South Lat:");
   private JTextField sLatValueFld;
   private JTextField widthFld;
@@ -173,7 +174,7 @@ public class CommandPanel
       {
         int slider = ((JSlider)evt.getSource()).getValue();
         double zoom = 50D / (double)slider;
-        zoomValueFld.setText(Double.toString(zoom));
+        zoomValueFld.setText(DF22.format(zoom));
         chartPanel.applyZoom(zoom);
       }
 
