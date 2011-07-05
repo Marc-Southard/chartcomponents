@@ -71,6 +71,11 @@ public class World
 //          gr.setColor(c);
 //        }
         XMLElement section = (XMLElement)nl.item(i);
+        /*
+        String id = section.getAttribute("id");
+        if ("148".equals(id))
+          gr.setColor(Color.red);
+        */
         NodeList nl2 = section.selectNodes("./point");
         Point previous = null;
         Point first = null;
