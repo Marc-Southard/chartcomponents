@@ -44,12 +44,12 @@ public class Spatial
   {
     Color origColor = cpi.getChartColor();
     double maxL = -Double.MAX_VALUE;
-    double minL = Double.MAX_VALUE;
+    double minL =  Double.MAX_VALUE;
     double maxG = -Double.MAX_VALUE;
-    double minG = Double.MAX_VALUE;
+    double minG =  Double.MAX_VALUE;
     try
     {
-      if(nl == null)
+      if (nl == null)
       {
         URL data = this.getClass().getResource(fileName);
         DOMParser parser = new DOMParser();
