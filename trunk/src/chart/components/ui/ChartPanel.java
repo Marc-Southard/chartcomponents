@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.MouseMotionListener;
@@ -680,6 +681,10 @@ public class ChartPanel
   
   public void paintComponent(Graphics g)
   {
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);      
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                     RenderingHints.VALUE_ANTIALIAS_ON);      
     if (cleanFirst)
     {
       if (backGroundGradient != null)
