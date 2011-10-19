@@ -2942,6 +2942,11 @@ public class ChartPanel
       ((ChartPanelParentInterface_II)parent).afterEvent(e, ChartPanel.MOUSE_MOVED);
   }
 
+  public void setDefaultCursor()
+  {
+    this.setCursor(defaultCursor);  
+  }
+  
   public double calculateEastG(double nLat, double sLat, double wLong)
   {
     double deltaIncLat = 0.0D;

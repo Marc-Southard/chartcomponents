@@ -239,7 +239,8 @@ public class PlottingSheetImpl
 
   public void chartPanelPaintComponent(Graphics gr)
   {
-    plottingSheet.chartPanelPaintComponent(gr);
+//  plottingSheet.chartPanelPaintComponent(gr);
+    plottingSheet.repaint();
 
     double saveZoom = plottingSheet.getZoomFactor();
     double z = Math.min((double) centerPanel.getWidth() / (double) plottingSheet.getWidth(),

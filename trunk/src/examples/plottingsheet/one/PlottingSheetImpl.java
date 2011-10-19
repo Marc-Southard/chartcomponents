@@ -239,7 +239,8 @@ public class PlottingSheetImpl
 
   public void chartPanelPaintComponent(Graphics gr)
   {
-    plottingSheet.chartPanelPaintComponent(gr);
+//  plottingSheet.chartPanelPaintComponent(gr);
+    plottingSheet.repaint();
 
     // Specific goes here
     GeoPoint[] groundData = new GeoPoint[]
