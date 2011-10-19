@@ -66,8 +66,10 @@ public class PlottingSheet
     this.setWithLngLabels(false); // Because this is a canvas    
   }
   
-  public void chartPanelPaintComponent(Graphics gr)
+  public void paintComponent(Graphics gr)
+//public void chartPanelPaintComponent(Graphics gr)
   {
+    super.paintComponent(gr);
   //  MercatorUtil.drawMercatorScale(gr, 100, 100, 10, 10, Color.darkGray);
     
     // Mercator Plotting Sheet circle.
@@ -152,5 +154,20 @@ public class PlottingSheet
   public void setWithDistanceScale(boolean withScale)
   {
     this.withDistanceScale = withScale;
+  }
+
+  public double getChartLatitudeSpan()
+  {
+    return chartLatitudeSpan;
+  }
+
+  public double getCenterLat()
+  {
+    return centerLat;
+  }
+
+  public double getCenterLong()
+  {
+    return centerLong;
   }
 }
