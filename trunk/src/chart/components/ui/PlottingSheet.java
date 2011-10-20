@@ -24,6 +24,7 @@ public class PlottingSheet
   private boolean withDistanceScale = true;
   
   private final static DecimalFormat DF15 = new DecimalFormat("##0.00000");
+  private final static DecimalFormat DF41 = new DecimalFormat("###0.0");
 
   public PlottingSheet(ChartPanelParentInterface chartPanelParentInterface, 
                        int w, 
@@ -126,8 +127,11 @@ public class PlottingSheet
       gr.drawLine(p2.x, p2.y, p2.x, p2.y - 5);
       GeoPoint g1 = this.getGeoPos(p1.x, p1.y);
       GeoPoint g2 = this.getGeoPos(p2.x, p2.y);
-      double rhumLineDistance = GreatCircle.calculateRhumLineDistance(g1, g2);
-      gr.drawString(DF15.format(rhumLineDistance) + " nm", 10 + (rect.width / 4) + 10, rect.height - 10);
+      double rhumbLineDistance = GreatCircle.calculateRhumLineDistance(g1, g2) * 60d;
+      String mess = DF15.format(rhumbLineDistance) + " nm";
+      if (rhumbLineDistance < 0.05)
+        mess += (" ( " + DF41.format(rhumbLineDistance * 1852) + " meter(s) )");
+      gr.drawString(mess, 10 + (rect.width / 4) + 10, rect.height - 10);
     }
   }
 
