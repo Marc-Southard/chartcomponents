@@ -66,6 +66,7 @@ import javax.swing.Scrollable;
 
 import user.util.GeomUtil;
 
+@SuppressWarnings("serial")
 public class ChartPanel 
      extends JPanel
   implements Scrollable, 
