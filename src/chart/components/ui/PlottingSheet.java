@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 
 import java.text.DecimalFormat;
 
+@SuppressWarnings("serial")
 public class PlottingSheet
   extends ChartPanel
 {
