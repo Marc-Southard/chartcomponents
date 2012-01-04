@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -34,7 +36,7 @@ public class CommandPanel
   private JButton zoomOutButton;
   private JCheckBox mouseCheckBox;
   
-  ArrayList<GeoPoint> track = new ArrayList<GeoPoint>();
+  List<GeoPoint> track = new ArrayList<GeoPoint>();
 
   public CommandPanel()
   {

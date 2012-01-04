@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -184,7 +185,7 @@ public class CommandPanel
   private void tripActionPerformed(ActionEvent e)
   {
     // Build array list
-    ArrayList<GeoPoint> al = new ArrayList<GeoPoint>(10);
+    List<GeoPoint> al = new ArrayList<GeoPoint>(10);
     for (int i=1; i<gpa.length; i++)
     {
       GreatCircle gc = new GreatCircle();
