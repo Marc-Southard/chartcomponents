@@ -54,6 +54,7 @@ import java.util.EventListener;
 
 import java.util.Iterator;
 
+import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -66,7 +67,6 @@ import javax.swing.Scrollable;
 
 import user.util.GeomUtil;
 
-@SuppressWarnings("serial")
 public class ChartPanel 
      extends JPanel
   implements Scrollable, 
@@ -155,8 +155,8 @@ public class ChartPanel
   private int draggedFromY;
   private boolean dragged;
   private Rectangle draggingRectangle;
-  private transient ArrayList<Point> lineToDraw = null;
-  private transient ArrayList<ArrayList> handDrawing = null;
+  private transient List<Point> lineToDraw = null;
+  private transient ArrayList<ArrayList<GeoPoint>> handDrawing = null;
   private transient ArrayList<GeoPoint> oneDrawing  = null;
   private double east;
   private double west;
@@ -602,7 +602,7 @@ public class ChartPanel
   private boolean playVideo = false;
   private boolean pauseVideo = false;
   private int videoStart = 0;
-  private ArrayList array = null;
+  private List array = null;
   private int currentVideoIndex = Integer.MIN_VALUE;
   private int videoIncrement    = 1;
   
@@ -640,7 +640,7 @@ public class ChartPanel
     videoSleep = l;
   }
   
-  public void playVideo(final ArrayList al)
+  public void playVideo(final List al)
   {
     playVideo = true;
     pauseVideo = false;
@@ -760,15 +760,15 @@ public class ChartPanel
       }
       if (handDrawing != null)
       {
-        Iterator iterator = handDrawing.iterator();
+        Iterator<ArrayList<GeoPoint>> iterator = handDrawing.iterator();
         while (iterator.hasNext())
         {
-          ArrayList al = (ArrayList)iterator.next();
-          Iterator iterator2 = al.iterator();
+          ArrayList<GeoPoint> al = iterator.next();
+          Iterator<GeoPoint> iterator2 = al.iterator();
           GeoPoint previous = null;
           while (iterator2.hasNext())
           {
-            GeoPoint dpt = (GeoPoint)iterator2.next();
+            GeoPoint dpt = iterator2.next();
             if (previous != null)
             {
               Point f = getPanelPoint(previous.getL(), previous.getG());
@@ -2746,7 +2746,7 @@ public class ChartPanel
       if (dragged && mouseDraggedType == MOUSE_DRAW_ON_CHART)
       {
         if (handDrawing == null)
-          handDrawing = new ArrayList<ArrayList>(10);
+          handDrawing = new ArrayList<ArrayList<GeoPoint>>(10);
         handDrawing.add(oneDrawing);
         oneDrawing = null;
       }
@@ -3269,14 +3269,14 @@ public class ChartPanel
     return drawThickness;
   }
 
-  public void setHandDrawing(ArrayList<ArrayList> handDrawing)
+  public void setHandDrawing(ArrayList<ArrayList<GeoPoint>> handDrawing)
   {
     this.handDrawing = handDrawing;
     if (handDrawing == null)
       oneDrawing = null;
   }
 
-  public ArrayList<ArrayList> getHandDrawing()
+  public ArrayList<ArrayList<GeoPoint>> getHandDrawing()
   {
     return handDrawing;
   }
@@ -3286,7 +3286,7 @@ public class ChartPanel
     this.oneDrawing = oneDrawing;
   }
 
-  public ArrayList<GeoPoint> getOneDrawing()
+  public List<GeoPoint> getOneDrawing()
   {
     return oneDrawing;
   }

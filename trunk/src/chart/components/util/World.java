@@ -7,6 +7,8 @@ import java.awt.Point;
 //import java.io.PrintStream;
 import java.util.ArrayList;
 
+import java.util.List;
+
 import oracle.xml.parser.v2.XMLDocument;
 import oracle.xml.parser.v2.XMLElement;
 import oracle.xml.parser.v2.DOMParser;
@@ -155,14 +157,14 @@ public class World
     }
   }
 
-  public static ArrayList getChartPoints(ChartPanelInterface cpi)
+  public static List<List<Point>> getChartPoints(ChartPanelInterface cpi)
   {
     return getChartPoints(cpi, null);
   }
   
-  public static ArrayList getChartPoints(ChartPanelInterface cpi, DOMParser parser)
+  public static List<List<Point>> getChartPoints(ChartPanelInterface cpi, DOMParser parser)
   {
-    ArrayList<ArrayList> chartPoints = null;
+    List<List<Point>> chartPoints = null;
     try
     {
       java.net.URL data = World.class.getResource("data.xml");
@@ -171,12 +173,12 @@ public class World
       parser.parse(data);
       XMLDocument doc = parser.getDocument();
       NodeList nl = doc.selectNodes("//section");
-      chartPoints = new ArrayList<ArrayList>(nl.getLength());
+      chartPoints = new ArrayList<List<Point>>(nl.getLength());
       for (int i = 0; i < nl.getLength(); i++)
       {
         XMLElement section = (XMLElement)nl.item(i);
         NodeList nl2 = section.selectNodes("./point");
-        ArrayList<Point> sectionPts = new ArrayList<Point>(nl2.getLength());
+        List<Point> sectionPts = new ArrayList<Point>(nl2.getLength());
         Point previous = null;
         Point first = null;
         for (int j = 0; j < nl2.getLength(); j++)
