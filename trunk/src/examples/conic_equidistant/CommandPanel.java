@@ -84,11 +84,18 @@ public class CommandPanel
     
     double nLat = 0D, sLat = 0D, wLong = 0D, eLong = 0D, cp = 0D;
     
-    nLat  =   62D;
-    sLat  =   05D;
-    wLong =  140D;
-    eLong =  -80D; // -160D
-    cp = 45D;
+//    nLat  =   62D;
+//    sLat  =   05D;
+//    wLong =  140D;
+//    eLong =  -80D; // -160D
+//    cp = 45D;
+
+    nLat  =   85D;
+    sLat  =   25D;
+    wLong = -110D;
+    eLong =   70D; // -160D
+    cp = 75D;
+
 //  double eLong = chartPanel.calculateEastG(nLat, sLat, wLong);
 
     chartPanel.setProjection(ChartPanel.CONIC_EQUIDISTANT);
