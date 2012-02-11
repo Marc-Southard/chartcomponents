@@ -4,15 +4,29 @@ import astro.calc.GeoPoint;
 import java.awt.Color;
 import java.awt.Point;
 
+@SuppressWarnings("serial")
 public interface ChartPanelInterface
 {
-  public static final int ANAXIMANDRE       = 0;
-  public static final int MERCATOR          = 1;
-  public static final int LAMBERT           = 2;
-  public static final int GLOBE_VIEW        = 3;
-  public static final int SATELLITE_VIEW    = 4;
-  public static final int CONIC_EQUIDISTANT = 5;
-  public static final int LCC               = 6;
+  public static final int ANAXIMANDRE         = 0;
+  public static final int MERCATOR            = 1;
+  public static final int LAMBERT             = 2;
+  public static final int GLOBE_VIEW          = 3;
+  public static final int SATELLITE_VIEW      = 4;
+  public static final int CONIC_EQUIDISTANT   = 5;
+  public static final int STEREOGRAPHIC       = 6;
+  public static final int POLAR_STEREOGRAPHIC = 7;
+  
+  public static enum PROJECTIONS
+  {
+    ANAXIMANDRE,
+    MERCATOR,
+    LAMBERT,
+    GLOBE_VIEW,
+    SATELLITE_VIEW,
+    CONIC_EQUIDISTANT,
+    STEREOGRAPHIC,
+    POLAR_STEREOGRAPHIC
+  }
 
   public abstract void setZoomFactor(double d);
   public abstract double getZoomFactor();

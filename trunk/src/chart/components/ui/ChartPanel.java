@@ -67,6 +67,7 @@ import javax.swing.Scrollable;
 
 import user.util.GeomUtil;
 
+@SuppressWarnings("serial")
 public class ChartPanel 
      extends JPanel
   implements Scrollable, 
@@ -170,6 +171,9 @@ public class ChartPanel
   private double globeView_ratio;
   private int globeViewOffset_X;
   private int globeViewOffset_Y;
+  private double stereoView_ratio;
+  private int stereoViewOffset_X;
+  private int stereoViewOffset_Y;
   private double globeViewLngOffset = 0.0;
   private double globeViewRightLeftRotation = 0.0;
   private double globeViewForeAftRotation = 0.0;
@@ -202,7 +206,7 @@ public class ChartPanel
 
   public ChartPanel(ChartPanelParentInterface cppi, int w, int h)
   {
-    projection = 1;
+    projection = ChartPanelInterface.MERCATOR;
     mouseDraggedEnabled   = true;
     enablePositionTooltip = true;
     cleanFirst = true;
@@ -872,7 +876,6 @@ public class ChartPanel
         break;
       case ChartPanelInterface.LAMBERT:
       case ChartPanelInterface.CONIC_EQUIDISTANT:
-      case ChartPanelInterface.LCC:
         drawConicGrid(g);
         break;
       case ChartPanelInterface.GLOBE_VIEW:
@@ -880,6 +883,12 @@ public class ChartPanel
         break;
       case ChartPanelInterface.SATELLITE_VIEW:
         drawSatelliteGrid(g);
+        break;
+      case ChartPanelInterface.STEREOGRAPHIC:
+        drawStereoGrid(g);
+        break;
+      case ChartPanelInterface.POLAR_STEREOGRAPHIC:
+        drawPolarStereoGrid(g);
         break;
       default:
         System.out.println("What? from drawGrid");
@@ -913,7 +922,6 @@ public class ChartPanel
           break;
         case ChartPanelInterface.LAMBERT:
         case ChartPanelInterface.CONIC_EQUIDISTANT:
-        case ChartPanelInterface.LCC:
         case ChartPanelInterface.GLOBE_VIEW:
         case ChartPanelInterface.SATELLITE_VIEW:
         default:
@@ -1105,7 +1113,7 @@ public class ChartPanel
 
   private void drawConicGrid(Graphics g)
   {
-    if (projection != ChartPanelInterface.LAMBERT && projection != ChartPanelInterface.CONIC_EQUIDISTANT && projection != ChartPanelInterface.LCC)
+    if (projection != ChartPanelInterface.LAMBERT && projection != ChartPanelInterface.CONIC_EQUIDISTANT)
     {
       System.out.println("Wow! What's that!?");
       return;
@@ -1119,62 +1127,58 @@ public class ChartPanel
         return;
       }
     }
-    if (projection == ChartPanelInterface.LCC)
-    {
-      // TODO 2 contact parallels
-    }
     double graph2chartRatio = 1.0D;
+
+    double minX = Double.MAX_VALUE;
+    double maxX = -Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    double maxY = -Double.MAX_VALUE;
+    double gOrig = Math.ceil(_west);
+    double gProgress = gOrig;
+    if (gProgress % vGrid != (double)0)
+      gProgress = (double)((int)(gProgress / vGrid) + 1) * vGrid;
+    boolean go = true;
+    while (go)
     {
-      double minX = Double.MAX_VALUE;
-      double maxX = -Double.MAX_VALUE;
-      double minY = Double.MAX_VALUE;
-      double maxY = -Double.MAX_VALUE;
-      double gOrig = Math.ceil(_west);
-      double gProgress = gOrig;
-      if (gProgress % vGrid != (double)0)
-        gProgress = (double)((int)(gProgress / vGrid) + 1) * vGrid;
-      boolean go = true;
-      while (go)
-      {
-        double[] xy = null;
-        if (projection == ChartPanelInterface.LAMBERT) 
-          xy = calculateLambertCoordinates(Math.toRadians(_south), Math.toRadians(gProgress), Math.toRadians(contactParallel));
-        if (projection == ChartPanelInterface.CONIC_EQUIDISTANT) 
-          xy = calculateCECoordinates(Math.toRadians(_south), Math.toRadians(gProgress), Math.toRadians(contactParallel));
-        double dx = xy[0];
-        double dy = xy[1];
-        if (dx < minX)
-          minX = dx;
-        if (dx > maxX)
-          maxX = dx;
-        if (dy < minY)
-          minY = dy;
-        if (dy > maxY)
-          maxY = dy;
-        if (projection == ChartPanelInterface.LAMBERT) 
-          xy = calculateLambertCoordinates(Math.toRadians(_north), Math.toRadians(gProgress), Math.toRadians(contactParallel));
-        if (projection == ChartPanelInterface.CONIC_EQUIDISTANT) 
-          xy = calculateCECoordinates(Math.toRadians(_north), Math.toRadians(gProgress), Math.toRadians(contactParallel));
-        dx = xy[0];
-        dy = xy[1];
-        if (dx < minX)
-          minX = dx;
-        if (dx > maxX)
-          maxX = dx;
-        if (dy < minY)
-          minY = dy;
-        if (dy > maxY)
-          maxY = dy;
-        gProgress += vGrid;
-        if (gProgress > _east)
-          go = false;
-      }
-      double conicWidth = Math.abs(maxX - minX);
-      double conicHeight = Math.abs(maxY - minY);
-      conic_ratio = Math.min((double)w / conicWidth, (double)h / conicHeight);
-      conicOffset_X = Math.abs((int)(conic_ratio * conicWidth) - w) / 2 - (int)(conic_ratio * minX);
-      conicOffset_Y = Math.abs((int)(conic_ratio * conicHeight) - h) / 2 - (int)(conic_ratio * minY);
+      double[] xy = null;
+      if (projection == ChartPanelInterface.LAMBERT) 
+        xy = calculateLambertCoordinates(Math.toRadians(_south), Math.toRadians(gProgress), Math.toRadians(contactParallel));
+      if (projection == ChartPanelInterface.CONIC_EQUIDISTANT) 
+        xy = calculateCECoordinates(Math.toRadians(_south), Math.toRadians(gProgress), Math.toRadians(contactParallel));
+      double dx = xy[0];
+      double dy = xy[1];
+      if (dx < minX)
+        minX = dx;
+      if (dx > maxX)
+        maxX = dx;
+      if (dy < minY)
+        minY = dy;
+      if (dy > maxY)
+        maxY = dy;
+      if (projection == ChartPanelInterface.LAMBERT) 
+        xy = calculateLambertCoordinates(Math.toRadians(_north), Math.toRadians(gProgress), Math.toRadians(contactParallel));
+      if (projection == ChartPanelInterface.CONIC_EQUIDISTANT) 
+        xy = calculateCECoordinates(Math.toRadians(_north), Math.toRadians(gProgress), Math.toRadians(contactParallel));
+      dx = xy[0];
+      dy = xy[1];
+      if (dx < minX)
+        minX = dx;
+      if (dx > maxX)
+        maxX = dx;
+      if (dy < minY)
+        minY = dy;
+      if (dy > maxY)
+        maxY = dy;
+      gProgress += vGrid;
+      if (gProgress > _east)
+        go = false;
     }
+    double conicWidth = Math.abs(maxX - minX);
+    double conicHeight = Math.abs(maxY - minY);
+    conic_ratio = Math.min((double)w / conicWidth, (double)h / conicHeight);
+    conicOffset_X = Math.abs((int)(conic_ratio * conicWidth) - w) / 2 - (int)(conic_ratio * minX);
+    conicOffset_Y = (Math.abs((int)(conic_ratio * conicHeight) - h) / 2) - (int)(conic_ratio * minY);
+
     if (_north != _south && _east != _west)
     {
 //    System.out.println("Determining the rotation angle");
@@ -1203,11 +1207,11 @@ public class ChartPanel
         conic_rotation = Math.atan(atan);
         if (deltaX < 0D)
           conic_rotation += Math.PI;
-        double gOrig = Math.ceil(_west);
-        double gProgress = gOrig;
+        gOrig = Math.ceil(_west);
+        gProgress = gOrig;
         if (gProgress % vGrid != (double)0)
           gProgress = (double)((int)(gProgress / vGrid) + 1) * vGrid;
-        boolean go = true;
+        go = true;
         while (go)
         {
           double[] xy_ = null;
@@ -1235,10 +1239,10 @@ public class ChartPanel
         if (lProgress % hGrid != (double)0)
           lProgress = (double)((int)(lProgress / hGrid) + 1) * hGrid;
         go = true;
-        double minX =  Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double minY =  Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
+        minX =  Double.MAX_VALUE;
+        maxX = -Double.MAX_VALUE;
+        minY =  Double.MAX_VALUE;
+        maxY = -Double.MAX_VALUE;
         while (go)
         {
           int previousX = Integer.MAX_VALUE;
@@ -1565,6 +1569,302 @@ public class ChartPanel
     }
   }  
   
+  private void drawStereoGrid(Graphics g)
+  {
+    if (projection != ChartPanelInterface.STEREOGRAPHIC)
+    {
+      System.out.println("Wow! What are we doing here?");
+      return;
+    }
+    switch (projection)
+    {
+      case ChartPanelInterface.STEREOGRAPHIC:
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        
+        double gOrig = Math.ceil(_west);
+        double gProgress = gOrig;
+        
+        if (gProgress % vGrid != 0d)
+          gProgress = (double)((int)(gProgress / vGrid) + 1) * vGrid;
+        boolean go = true;
+        
+//      double __south = _south + globeViewForeAftRotation;
+//      double __north = _north - globeViewForeAftRotation;
+        
+        double __south = -90;
+        double __north =  90;
+        
+        while (go)
+        {
+          for (double _lat = __south; _lat <= __north; _lat+=5d)
+          {
+            double[] xy = calculateStereoGraphicXYCoordinates(_lat, gProgress);
+            double dx = xy[0];
+            double dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+            if (dx < minX) minX = dx;
+            if (dx > maxX) maxX = dx;
+            if (dy < minY) minY = dy;
+            if (dy > maxY) maxY = dy;
+          } 
+          gProgress += vGrid;
+          if (gProgress > _east)
+            go = false;
+        }
+        
+        gOrig = Math.ceil(__south);
+        double lProgress = gOrig;
+        if (lProgress % hGrid != (double)0)
+          lProgress = (double)((int)(lProgress / hGrid) + 1) * hGrid;
+        go = true;
+        while (go)
+        {
+          double[] xy = calculateStereoGraphicXYCoordinates(lProgress, _west);
+          double dx = xy[0];
+          double dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+          if (dx < minX) minX = dx;
+          if (dx > maxX) maxX = dx;
+          if (dy < minY) minY = dy;
+          if (dy > maxY) maxY = dy;
+          xy = calculateStereoGraphicXYCoordinates(lProgress, _east);
+          dx = xy[0];
+          dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+          if (dx < minX) minX = dx;
+          if (dx > maxX) maxX = dx;
+          if (dy < minY) minY = dy;
+          if (dy > maxY) maxY = dy;
+          lProgress += hGrid;
+          if (lProgress > __north)
+            go = false;
+        }
+//      System.out.println("Stereo - MinX:" + minX + ", MaxX:" + maxX + ", MinY:" + minY + ", MaxY:" + maxY);
+        double opWidth = Math.abs(maxX - minX);
+        double opHeight = Math.abs(maxY - minY);
+        stereoView_ratio = Math.min((double)w / opWidth, (double)h / opHeight);
+//      System.out.println("Width:" + opWidth + ", Height:" + opHeight);
+//      stereoViewOffset_X = (int)(- minX);
+//      stereoViewOffset_Y = (int)(- minY);        
+        stereoViewOffset_X = ((int)Math.abs((int)(stereoView_ratio * opWidth) - w) / 2) - (int)(stereoView_ratio * minX);
+//      stereoViewOffset_Y = ((int)Math.abs((int)(stereoView_ratio * opHeight) - h) / 2) - (int)(stereoView_ratio * minY);        
+        stereoViewOffset_Y = ((int)Math.abs((int)(stereoView_ratio * opHeight) - h) / 2) + (int)(stereoView_ratio * maxY);        
+//      System.out.println("StereoView Ratio:" + stereoView_ratio + ", SVoffsetX:" + stereoViewOffset_X + ", SVoffsetY:" + stereoViewOffset_Y);
+//      System.out.println("NewWidth:" + (opWidth * stereoView_ratio) + ", newHeight:" + (opHeight * stereoView_ratio));
+        break;
+      default:
+        break;
+    } 
+
+    double gstep = 10D; //Math.abs(_east - _west) / 60;
+    double lstep = 10D;  //Math.abs(_north - _south) / 10;
+    // Meridians
+    for (double i=Math.min(_east, _west); i<Math.max(_east, _west); i+=gstep)
+    {      
+      Point previous = null;
+      for (double j=Math.min(_south, _north) + (lstep / 5); j<Math.max(_south, _north); j+=(lstep/5))
+      {
+        Point p = getPanelPoint(j, i);
+        boolean thisPointIsBehind = isBehind(j, i - globeViewLngOffset);
+        if (altGridColor != null)
+        {
+          if (thisPointIsBehind)
+            g.setColor(altGridColor);
+          else
+            g.setColor(gridColor);
+        }
+        if (projection == ChartPanelInterface.GLOBE_VIEW && !isTransparentGlobe() && thisPointIsBehind)
+          previous = null;
+        else if (projection == ChartPanelInterface.GLOBE_VIEW && !isAntiTransparentGlobe() && !thisPointIsBehind)
+          previous = null;
+        else
+        {
+          if (previous != null)
+            g.drawLine(previous.x, previous.y, p.x, p.y);
+          previous = p;
+        }
+      }
+    }
+    // Parallels
+    for (double j=Math.min(_south, _north) + lstep; j<Math.max(_south, _north); j+=lstep)
+    {      
+      Point previous = null;
+      for (double i=Math.min(_east, _west); i<=Math.max(_east, _west); i+=gstep)
+      {
+        Point p = getPanelPoint(j, i);
+        boolean thisPointIsBehind = isBehind(j, i - globeViewLngOffset);
+        if (altGridColor != null)
+        {
+          if (thisPointIsBehind)
+            g.setColor(altGridColor);
+          else
+            g.setColor(gridColor);
+        }
+        if (projection == ChartPanelInterface.GLOBE_VIEW && !isTransparentGlobe() && thisPointIsBehind)
+          previous = null;
+        else if (projection == ChartPanelInterface.GLOBE_VIEW && !isAntiTransparentGlobe() && !thisPointIsBehind)
+          previous = null;
+        else
+        {
+          if (previous != null)
+            g.drawLine(previous.x, previous.y, p.x, p.y);
+          previous = p;
+        }
+      }
+    }    
+  }
+  
+  private void drawPolarStereoGrid(Graphics g)
+  {
+    if (projection != ChartPanelInterface.POLAR_STEREOGRAPHIC)
+    {
+      System.out.println("Wow! What are we doing here?");
+      return;
+    }
+    switch (projection)
+    {
+      case ChartPanelInterface.POLAR_STEREOGRAPHIC:
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        
+        double gOrig = Math.ceil(_west);
+        double gProgress = gOrig;
+        
+        if (gProgress % vGrid != 0d)
+          gProgress = (double)((int)(gProgress / vGrid) + 1) * vGrid;
+        boolean go = true;
+        
+  //      double __south = _south + globeViewForeAftRotation;
+  //      double __north = _north - globeViewForeAftRotation;
+        
+        double __south = -90;
+        double __north =  90;
+        
+        while (go)
+        {
+          for (double _lat = __south; _lat <= __north; _lat+=5d)
+          {
+            double[] xy = calculatePolarStereoGraphicXYCoordinates(_lat, gProgress);
+            double dx = xy[0];
+            double dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+            if (dx < minX) minX = dx;
+            if (dx > maxX) maxX = dx;
+            if (dy < minY) minY = dy;
+            if (dy > maxY) maxY = dy;
+          } 
+          gProgress += vGrid;
+          if (gProgress > _east)
+            go = false;
+        }
+        
+        gOrig = Math.ceil(__south);
+        double lProgress = gOrig;
+        if (lProgress % hGrid != (double)0)
+          lProgress = (double)((int)(lProgress / hGrid) + 1) * hGrid;
+        go = true;
+        while (go)
+        {
+          double[] xy = calculatePolarStereoGraphicXYCoordinates(lProgress, _west);
+          double dx = xy[0];
+          double dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+          if (dx < minX) minX = dx;
+          if (dx > maxX) maxX = dx;
+          if (dy < minY) minY = dy;
+          if (dy > maxY) maxY = dy;
+          xy = calculatePolarStereoGraphicXYCoordinates(lProgress, _east);
+          dx = xy[0];
+          dy = xy[1];
+    //        System.out.println("dx:" + dx + ", dy:" + dy);
+          if (dx < minX) minX = dx;
+          if (dx > maxX) maxX = dx;
+          if (dy < minY) minY = dy;
+          if (dy > maxY) maxY = dy;
+          lProgress += hGrid;
+          if (lProgress > __north)
+            go = false;
+        }
+  //      System.out.println("Stereo - MinX:" + minX + ", MaxX:" + maxX + ", MinY:" + minY + ", MaxY:" + maxY);
+        double opWidth = Math.abs(maxX - minX);
+        double opHeight = Math.abs(maxY - minY);
+        stereoView_ratio = Math.min((double)w / opWidth, (double)h / opHeight);
+  //      System.out.println("Width:" + opWidth + ", Height:" + opHeight);
+  //      stereoViewOffset_X = (int)(- minX);
+  //      stereoViewOffset_Y = (int)(- minY);
+        stereoViewOffset_X = ((int)Math.abs((int)(stereoView_ratio * opWidth) - w) / 2) - (int)(stereoView_ratio * minX);
+        stereoViewOffset_Y = 0; // ((int)Math.abs((int)(stereoView_ratio * opHeight) - h) / 2) - (int)(stereoView_ratio * minY);
+  //    stereoViewOffset_Y = ((int)Math.abs((int)(stereoView_ratio * opHeight) - h) / 2) + (int)(stereoView_ratio * minY);        
+  //      System.out.println("StereoView Ratio:" + stereoView_ratio + ", SVoffsetX:" + stereoViewOffset_X + ", SVoffsetY:" + stereoViewOffset_Y);
+  //      System.out.println("NewWidth:" + (opWidth * stereoView_ratio) + ", newHeight:" + (opHeight * stereoView_ratio));
+        break;
+      default:
+        break;
+    } 
+
+    double gstep = 10D; //Math.abs(_east - _west) / 60;
+    double lstep = 10D;  //Math.abs(_north - _south) / 10;
+    // Meridians
+    for (double i=Math.min(_east, _west); i<Math.max(_east, _west); i+=gstep)
+    {      
+      Point previous = null;
+      for (double j=Math.min(_south, _north) + (lstep / 5); j<Math.max(_south, _north); j+=(lstep/5))
+      {
+        Point p = getPanelPoint(j, i);
+        boolean thisPointIsBehind = isBehind(j, i - globeViewLngOffset);
+        if (altGridColor != null)
+        {
+          if (thisPointIsBehind)
+            g.setColor(altGridColor);
+          else
+            g.setColor(gridColor);
+        }
+        if (projection == ChartPanelInterface.GLOBE_VIEW && !isTransparentGlobe() && thisPointIsBehind)
+          previous = null;
+        else if (projection == ChartPanelInterface.GLOBE_VIEW && !isAntiTransparentGlobe() && !thisPointIsBehind)
+          previous = null;
+        else
+        {
+          if (previous != null)
+            g.drawLine(previous.x, previous.y, p.x, p.y);
+          previous = p;
+        }
+      }
+    }
+    // Parallels
+    for (double j=Math.min(_south, _north) + lstep; j<Math.max(_south, _north); j+=lstep)
+    {      
+      Point previous = null;
+      for (double i=Math.min(_east, _west); i<=Math.max(_east, _west); i+=gstep)
+      {
+        Point p = getPanelPoint(j, i);
+        boolean thisPointIsBehind = isBehind(j, i - globeViewLngOffset);
+        if (altGridColor != null)
+        {
+          if (thisPointIsBehind)
+            g.setColor(altGridColor);
+          else
+            g.setColor(gridColor);
+        }
+        if (projection == ChartPanelInterface.GLOBE_VIEW && !isTransparentGlobe() && thisPointIsBehind)
+          previous = null;
+        else if (projection == ChartPanelInterface.GLOBE_VIEW && !isAntiTransparentGlobe() && !thisPointIsBehind)
+          previous = null;
+        else
+        {
+          if (previous != null)
+            g.drawLine(previous.x, previous.y, p.x, p.y);
+          previous = p;
+        }
+      }
+    }    
+  }
+  
   private Point rotate(Point pt)
   {
     Point ret = null;
@@ -1623,18 +1923,6 @@ public class ChartPanel
     return new double[] { x, y };
   }
   
-  private double[] calculateLCCCoordinates(double lat, double lng, double lngRef, double secOne, double secTwo)
-  {
-    double n = 0; // Math.log();
-    double F = 0;
-    double rho = 0;
-    double rho0 = 0;
-    
-    double x = rho * Math.sin(n * (lng - lngRef));
-    double y = rho0 - (rho * Math.cos(n * (lng - lngRef)));
-    
-    return new double[] { x, y };
-  }
   /**
    * alpha, then beta
    * 
@@ -1751,6 +2039,45 @@ public class ChartPanel
     return rotateBothWays(lat, lng)[2];
   }
   
+  private static final double R = 635677D / 2000D;
+  private double[] calculateStereoGraphicXYCoordinates(double lat,
+                                                       double lng)
+  {
+    double[] xy = new double[2];
+    double lambdaZero = (west + east) / 2; 
+    double phiOne     = (north + south) / 2;
+    double k = (2*R) / (1 + (Math.sin(Math.toRadians(phiOne)) * Math.sin(Math.toRadians(lat))) +
+                            (Math.cos(Math.toRadians(phiOne)) * Math.cos(Math.toRadians(lat)) * Math.cos(Math.toRadians(lng - lambdaZero))));
+    double x = k * Math.cos(Math.toRadians(lat)) * Math.sin(Math.toRadians(lng - lambdaZero));
+    double y = k * ((Math.cos(Math.toRadians(phiOne)) * Math.sin(Math.toRadians(lat))) - 
+                    (Math.sin(Math.toRadians(phiOne)) * Math.cos(Math.toRadians(lat)) * Math.cos(Math.toRadians(lng - lambdaZero))));
+    
+    xy[0] = x;
+    xy[1] = y;
+    return xy;            
+  }
+
+  private double[] calculatePolarStereoGraphicXYCoordinates(double lat,
+                                                            double lng)
+  {
+    double[] xy = new double[2];
+    double lambdaZero = (west + east) / 2; 
+//  double phiOne     = (north + south) / 2;
+    
+    double phi = lat;
+    if (phi > 0)
+      phi = 90 - phi;
+    else
+      phi = -90 - phi;
+    
+    double x = -(2 * R) * Math.tan(Math.PI - Math.toRadians(phi / 2)) * Math.sin(Math.toRadians(lng - lambdaZero));
+    double y = (2 * R) * Math.tan(Math.PI - Math.toRadians(phi / 2)) * Math.cos(Math.toRadians(lng - lambdaZero));
+    
+    xy[0] = x;
+    xy[1] = y;
+    return xy;            
+  }
+
   /*
    * For Satellite view:
    * 
@@ -1971,7 +2298,7 @@ public class ChartPanel
       else
         v = 360D - v;
     
-    if ((int)v == v) // No minutes
+    if (((int)v) == v) // No minutes
     {
       label = Integer.toString((int)Math.abs(v)) + '\272';
       if (v > 0 && Math.abs(v) < 180.0)
@@ -2056,6 +2383,16 @@ public class ChartPanel
           x += globeViewOffset_X;
 //        x = (int)xy[0];
           break;
+        case ChartPanelInterface.STEREOGRAPHIC:
+          xy = calculateStereoGraphicXYCoordinates(lat, lng);
+          x = (int)Math.round(stereoView_ratio * xy[0]);
+          x += stereoViewOffset_X;
+          break;
+        case ChartPanelInterface.POLAR_STEREOGRAPHIC:
+          xy = calculatePolarStereoGraphicXYCoordinates(lat, lng);
+          x = (int)Math.round(stereoView_ratio * xy[0]);
+          x += stereoViewOffset_X;
+          break;
       }
       double incSouth = 0.0D;
       switch (projection)
@@ -2079,6 +2416,14 @@ public class ChartPanel
         case ChartPanelInterface.SATELLITE_VIEW:
           incSouth = (int)Math.round(globeView_ratio * xy[1]);
 //        incSouth = xy[1];
+          break;
+        case ChartPanelInterface.STEREOGRAPHIC:
+          xy = calculateStereoGraphicXYCoordinates(lat, lng);
+          incSouth = (int)Math.round(stereoView_ratio * xy[1]);
+          break;
+        case ChartPanelInterface.POLAR_STEREOGRAPHIC:
+          xy = calculatePolarStereoGraphicXYCoordinates(lat, lng);
+          incSouth = (int)Math.round(stereoView_ratio * xy[1]);
           break;
       }
       double incLat = 0.0D;
@@ -2108,6 +2453,14 @@ public class ChartPanel
         case ChartPanelInterface.SATELLITE_VIEW:
 //        y = h - (int)(globeViewOffset_Y - (int)incSouth);
           y = (int)(globeViewOffset_Y - (int)incSouth);
+          break;
+        case ChartPanelInterface.STEREOGRAPHIC:
+          incLat = lat;
+          y = (int)(stereoViewOffset_Y - (int)incSouth);
+          break;
+        case ChartPanelInterface.POLAR_STEREOGRAPHIC:
+          incLat = lat;
+          y = (int)(stereoViewOffset_Y - (int)incSouth);
           break;
       }
       pt = new Point(x, y);
@@ -2144,6 +2497,13 @@ public class ChartPanel
         default:
         case ChartPanelInterface.GLOBE_VIEW:
         case ChartPanelInterface.SATELLITE_VIEW:
+        case ChartPanelInterface.STEREOGRAPHIC: // TODO Sure?
+          break;
+        case ChartPanelInterface.POLAR_STEREOGRAPHIC: // See http://kartoweb.itc.nl/geometrics/Map%20projections/body.htm
+          double lambdaZero = (west + east) / 2; 
+          double _x = (x - stereoViewOffset_X) / stereoView_ratio;
+          double _y = (y - stereoViewOffset_Y) / stereoView_ratio;
+          g = lambdaZero + Math.toDegrees(Math.atan( _x / (_y))); 
           break;
         case ChartPanelInterface.ANAXIMANDRE:
         case ChartPanelInterface.MERCATOR:
@@ -2208,6 +2568,11 @@ public class ChartPanel
           if (contactParallel < 0D)
             qte *= -1D;
           l = Math.toDegrees(Math.atan(qte));
+          break;
+        case ChartPanelInterface.POLAR_STEREOGRAPHIC: // TODO See http://kartoweb.itc.nl/geometrics/Map%20projections/body.htm
+          double _x = (x - stereoViewOffset_X) / stereoView_ratio;
+          double _y = (y - stereoViewOffset_Y) / stereoView_ratio;
+          l = 90 - Math.toDegrees(2 * Math.atan(Math.sqrt(_x*_x + _y*_y)/(2*R)));
           break;
       }
       gp = new GeoPoint(l, g);
@@ -2974,8 +3339,8 @@ public class ChartPanel
     double deltaIncLat = 0.0D;
     switch (projection)
     {
-      case ChartPanelInterface.LAMBERT:
-        return;
+//      case ChartPanelInterface.LAMBERT:
+//        return;
       case ChartPanelInterface.ANAXIMANDRE:
         deltaIncLat = nLat - sLat;
         break;
@@ -2986,6 +3351,13 @@ public class ChartPanel
     double deltaG; // = eLong - wLong;
     for (deltaG = eLong - wLong; deltaG < 0D; deltaG += 360D);
     double graphicRatio = deltaG / deltaIncLat;
+    
+    if (projection != ChartPanelInterface.ANAXIMANDRE &&
+        projection != ChartPanelInterface.MERCATOR)
+      graphicRatio = 1d;
+    
+    graphicRatio = Math.max(graphicRatio, 1d); // To limit the excess of Increaling Latitude (over 80 degrees...)
+    
     w = (int)((double)h * graphicRatio);
     setPreferredSize(new Dimension(w, h));
   }

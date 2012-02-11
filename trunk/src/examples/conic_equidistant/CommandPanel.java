@@ -90,7 +90,7 @@ public class CommandPanel
 //    eLong =  -80D; // -160D
 //    cp = 45D;
 
-    nLat  =   85D;
+    nLat  =   90d; // 85D;
     sLat  =   25D;
     wLong = -110D;
     eLong =   70D; // -160D
