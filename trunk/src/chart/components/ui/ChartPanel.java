@@ -3355,8 +3355,9 @@ public class ChartPanel
     if (projection != ChartPanelInterface.ANAXIMANDRE &&
         projection != ChartPanelInterface.MERCATOR)
       graphicRatio = 1d;
-    
-    graphicRatio = Math.max(graphicRatio, 1d); // To limit the excess of Increaling Latitude (over 80 degrees...)
+  
+//  System.out.println("FYI: GraphicRatio:" + graphicRatio);
+    graphicRatio = Math.max(graphicRatio, 0.45d); // To limit the excess of Increaling Latitude (over 80 degrees...)
     
     w = (int)((double)h * graphicRatio);
     setPreferredSize(new Dimension(w, h));
