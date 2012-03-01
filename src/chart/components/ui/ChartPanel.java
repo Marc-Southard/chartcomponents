@@ -1840,7 +1840,7 @@ public class ChartPanel
     for (double j=Math.min(_south, _north) + lstep; j<Math.max(_south, _north); j+=lstep)
     {      
       Point previous = null;
-      for (double i=Math.min(_east, _west); i<=Math.max(_east, _west); i+=gstep)
+      for (double i=Math.min(_east, _west); i<=Math.max(_east, _west); i+=(gstep / 10)) // 10, for a smooth circle.
       {
         Point p = getPanelPoint(j, i);
         boolean thisPointIsBehind = isBehind(j, i - globeViewLngOffset);
@@ -2504,6 +2504,10 @@ public class ChartPanel
           double _x = (x - stereoViewOffset_X) / stereoView_ratio;
           double _y = (y - stereoViewOffset_Y) / stereoView_ratio;
           g = lambdaZero + Math.toDegrees(Math.atan( _x / (_y))); 
+          if (g < -180D)
+            g += 360D;
+          if (g > 180D)
+            g -= 360;
           break;
         case ChartPanelInterface.ANAXIMANDRE:
         case ChartPanelInterface.MERCATOR:
