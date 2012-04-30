@@ -16,16 +16,28 @@ public interface ChartPanelInterface
   public static final int STEREOGRAPHIC       = 6;
   public static final int POLAR_STEREOGRAPHIC = 7;
   
-  public static enum PROJECTIONS
+  public static enum Projection
   {
-    ANAXIMANDRE,
-    MERCATOR,
-    LAMBERT,
-    GLOBE_VIEW,
-    SATELLITE_VIEW,
-    CONIC_EQUIDISTANT,
-    STEREOGRAPHIC,
-    POLAR_STEREOGRAPHIC
+    ANAXIMANDRE         ("Anaximandre",         ChartPanelInterface.ANAXIMANDRE),
+    MERCATOR            ("Mercator",            ChartPanelInterface.MERCATOR),
+    LAMBERT             ("Lambert",             ChartPanelInterface.LAMBERT),
+    GLOBE_VIEW          ("Globe",               ChartPanelInterface.GLOBE_VIEW),
+    SATELLITE_VIEW      ("Satellite",           ChartPanelInterface.SATELLITE_VIEW),
+    CONIC_EQUIDISTANT   ("Conic Equidistant",   ChartPanelInterface.CONIC_EQUIDISTANT),
+    STEREOGRAPHIC       ("Stereographic",       ChartPanelInterface.STEREOGRAPHIC),
+    POLAR_STEREOGRAPHIC ("Polar Stereographic", ChartPanelInterface.POLAR_STEREOGRAPHIC);
+    
+    private final String label;
+    private final int index;
+    
+    Projection(String label, int index)
+    {
+      this.label = label;
+      this.index = index;
+    }
+    
+    public String label() { return this.label; }
+    public int index() { return this.index; }
   }
 
   public abstract void setZoomFactor(double d);
