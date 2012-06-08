@@ -31,8 +31,8 @@
       <version>v2</version>
     </dependency>
     <dependency>
-      <groupId>GeomUtil</groupId>
-      <artifactId>GeomUtil</artifactId>
+      <groupId>NMEAParser</groupId>
+      <artifactId>NMEAParser</artifactId>
       <version>1.0</version>
     </dependency>
   </dependencies>
@@ -53,5 +53,6 @@
     <groupId>OlivSoft</groupId>
     <artifactId>OlivSoft</artifactId>
     <version>1.0</version>
+    <relativePath>../weather-wizard.pom.xml</relativePath>
   </parent>
 </project>
