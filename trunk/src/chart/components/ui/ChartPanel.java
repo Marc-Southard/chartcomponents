@@ -21,17 +21,24 @@ import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.PixelGrabber;
 import java.awt.image.RenderedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
@@ -59,6 +66,7 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -276,19 +284,20 @@ public class ChartPanel
 //  imgFileName = "HandPointingRight.png";
     imgFileName = "right.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
-    handPointingRightCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
+    Dimension dim = toolkit.getBestCursorSize(16, 16); // Still 32x32...
+    handPointingRightCursor   = toolkit.createCustomCursor(image, new Point(15,15), imgFileName);
 //  imgFileName = "HandPointingLeft.png";
     imgFileName = "left.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
-    handPointingLeftCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
-//  imgFileName = "HandPointingUp.png";
+    handPointingLeftCursor   = toolkit.createCustomCursor(image, new Point(15,15), imgFileName);
+//   imgFileName = "HandPointingUp.png";
     imgFileName = "up.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
-    handPointingUpCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);
+    handPointingUpCursor   = toolkit.createCustomCursor(image, new Point(15,15), imgFileName);
 //  imgFileName = "HandPointingDown.png";
     imgFileName = "down.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
-    handPointingDownCursor   = toolkit.createCustomCursor(image , new Point(15,15), imgFileName);    
+    handPointingDownCursor   = toolkit.createCustomCursor(image, new Point(15,15), imgFileName);    
       
     imgFileName = "crayon.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
@@ -3246,27 +3255,27 @@ public class ChartPanel
           if (mouseEdgeProximityDetectionEnabled)
           {
             Dimension vrdim = this.getVisibleRect().getSize();
-//            System.out.println( "Position:" + e.getX() + ", " + e.getY() + 
+//            System.out.println( "Position:" + e.getX() + ", " + e.getY() + " (on " + this.getWidth() + " x " + this.getHeight() + ")" +
 //                               " Vis Rect: x=" + this.getVisibleRect().x + ", y=" + this.getVisibleRect().y + 
 //                                         " w=" + vrdim.width + ", h=" + vrdim.height);
             int mouseBefore = mouseEdgeProximity;
             
-            if (e.getX() <= (this.getVisibleRect().x + EDGE_PROXIMITY)) // Close to the left
+            if (e.getX() <= (this.getVisibleRect().x + EDGE_PROXIMITY) && Math.abs(e.getX()) > EDGE_PROXIMITY) // Close to the left
             {
               mouseEdgeProximity = MOUSE_CLOSE_TO_LEFT;
               this.setCursor(handPointingLeftCursor);
             }
-            else if (e.getY() <= (this.getVisibleRect().y + EDGE_PROXIMITY))
+            else if (e.getY() <= (this.getVisibleRect().y + EDGE_PROXIMITY) && Math.abs(e.getY()) > EDGE_PROXIMITY)
             {
               mouseEdgeProximity = MOUSE_CLOSE_TO_TOP;
               this.setCursor(handPointingUpCursor);
             }
-            else if (e.getX() >= (this.getVisibleRect().x + vrdim.width - EDGE_PROXIMITY))         
+            else if (e.getX() >= (this.getVisibleRect().x + vrdim.width - EDGE_PROXIMITY) && Math.abs(this.getWidth() - e.getX()) > EDGE_PROXIMITY)         
             {
               mouseEdgeProximity = MOUSE_CLOSE_TO_RIGHT;
               this.setCursor(handPointingRightCursor);
             }
-            else if (e.getY() >= (this.getVisibleRect().y + vrdim.height - EDGE_PROXIMITY))
+            else if (e.getY() >= (this.getVisibleRect().y + vrdim.height - EDGE_PROXIMITY) && Math.abs(this.getHeight() - e.getY()) > EDGE_PROXIMITY)
             {
               mouseEdgeProximity = MOUSE_CLOSE_TO_BOTTOM;
               this.setCursor(handPointingDownCursor);
