@@ -284,7 +284,7 @@ public class ChartPanel
 //  imgFileName = "HandPointingRight.png";
     imgFileName = "right.png";
     image = toolkit.getImage(ChartPanel.class.getResource(imgFileName));
-    Dimension dim = toolkit.getBestCursorSize(16, 16); // Still 32x32...
+//  Dimension dim = toolkit.getBestCursorSize(16, 16); // Still 32x32...
     handPointingRightCursor   = toolkit.createCustomCursor(image, new Point(15,15), imgFileName);
 //  imgFileName = "HandPointingLeft.png";
     imgFileName = "left.png";
