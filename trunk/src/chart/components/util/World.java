@@ -1,10 +1,14 @@
 package chart.components.util;
 
+import astro.calc.GeoPoint;
+
 import chart.components.ui.ChartPanelInterface;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 //import java.io.PrintStream;
+import java.awt.Polygon;
+
 import java.util.ArrayList;
 
 import java.util.List;
@@ -18,7 +22,8 @@ import org.w3c.dom.NodeList;
 public class World
 {
   private static DOMParser parser = null;
-  
+  private static List<Polygon> lp = null;
+    
   public static void drawChart(ChartPanelInterface cpi, Graphics gr)
   {
     drawChart(cpi, gr, 0, null);
@@ -248,5 +253,59 @@ public class World
       ex.printStackTrace();
     }
     return chartPoints;
+  }
+  
+  private static List<Polygon> getChartPolygon()
+  {
+    List<Polygon> listPolygon = new ArrayList<Polygon>();
+    try
+    {
+      java.net.URL data = World.class.getResource("data.xml");
+      if (parser == null)
+        parser = new DOMParser();
+      parser.parse(data);
+      XMLDocument doc = parser.getDocument();
+      NodeList nl = doc.selectNodes("//section");
+      for (int i = 0; i < nl.getLength(); i++)
+      {
+        Polygon polygon = new Polygon();
+        XMLElement section = (XMLElement)nl.item(i);
+        NodeList nl2 = section.selectNodes("./point");
+        for (int j = 0; j < nl2.getLength(); j++)
+        {
+          XMLElement pt = (XMLElement)nl2.item(j);
+          String latValue = pt.getElementsByTagName("Lat").item(0).getFirstChild().getNodeValue();
+          String lngValue = pt.getElementsByTagName("Lng").item(0).getFirstChild().getNodeValue();
+          double l = Double.parseDouble(latValue);
+          double g;
+          for (g = Double.parseDouble(lngValue); g > 180D; g -= 180D);
+          for (; g < -180D; g += 360D);
+          polygon.addPoint((int)(g * 1000), (int)(l * 1000));
+        }
+        listPolygon.add(polygon);
+      }
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace();
+    }
+    return listPolygon;
+  }
+  
+  public static boolean isInLand(GeoPoint gp)
+  {
+    if (lp == null)
+      lp = getChartPolygon();
+    boolean b = false;
+    Point p = new Point((int)(gp.getG() * 1000), (int)(gp.getL() * 1000));
+    for (Polygon poly : lp)
+    {
+      if (poly.contains(p))
+      {
+        b = true;
+        break;
+      }
+    }
+    return b;
   }
 }
