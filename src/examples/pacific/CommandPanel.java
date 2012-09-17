@@ -82,10 +82,16 @@ public class CommandPanel
     bottomPanel.add(zoomInButton, null);
     bottomPanel.add(zoomOutButton, null);
     add(bottomPanel, BorderLayout.SOUTH);
-    double nLat = 55D;
-    double sLat = -70D;
-    double wLong = 128.5D;
+//    double nLat = 55D;
+//    double sLat = -70D;
+//    double wLong = 128.5D;
+//    double eLong = chartPanel.calculateEastG(nLat, sLat, wLong);
+
+    double nLat = 66.5D;
+    double sLat = -48.5D;
+    double wLong = 127.5D;
     double eLong = chartPanel.calculateEastG(nLat, sLat, wLong);
+
     chartPanel.setEastG(eLong);
     chartPanel.setWestG(wLong);
     chartPanel.setNorthL(nLat);
@@ -116,7 +122,8 @@ public class CommandPanel
     Graphics2D g2d = null;
     if (gr instanceof Graphics2D)
       g2d = (Graphics2D)gr;
-    World.drawChart(chartPanel, gr, nbe, Color.RED);
+//  World.drawChart(chartPanel, gr, nbe, Color.RED);
+    World.paintChart(null, chartPanel, g2d, Color.orange);
     double ls = GeomUtil.sexToDec("37", "56");
     double gs = -GeomUtil.sexToDec("123", "4");
     double lf = GeomUtil.sexToDec("21", "15");
