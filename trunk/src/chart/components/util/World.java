@@ -172,6 +172,8 @@ public class World
   
   public static void paintChart(DOMParser p, ChartPanelInterface cpi, Graphics2D g2, Color c)
   {
+    Color origColor = g2.getColor();
+                                   
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     // Get the Polygons, from the data.xml and the ChartPanelInterface
     List<Polygon> listPolygon = new ArrayList<Polygon>();
@@ -189,6 +191,7 @@ public class World
         Polygon polygon = new Polygon();
         XMLElement section = (XMLElement)nl.item(i);
         NodeList nl2 = section.selectNodes("./point");
+        Point firstPoint = null;
         for (int j = 0; j < nl2.getLength(); j++)
         {
           XMLElement pt = (XMLElement)nl2.item(j);
@@ -203,7 +206,13 @@ public class World
             pp.x = previousPp.x;
           polygon.addPoint(pp.x, pp.y);
           previousPp = pp;
+          if (j == 0)
+            firstPoint = pp;
         }
+        // Close the loop?
+        if (false && firstPoint != null)
+          polygon.addPoint(firstPoint.x, firstPoint.y);          
+        
         listPolygon.add(polygon);
       }
     }
@@ -228,6 +237,8 @@ public class World
     // Draw the outline of the resulting Area.
     g2.setPaint(Color.black);
     g2.draw(area);
+
+    g2.setColor(origColor);
   }
 
   public static List<List<Point>> getChartPoints(ChartPanelInterface cpi)
