@@ -33,7 +33,6 @@ public class CommandPanel
   private JPanel bottomPanel;
   private JButton zoomInButton;
   private JButton zoomOutButton;
-  int nbe;
 
   public CommandPanel()
   {
@@ -43,7 +42,6 @@ public class CommandPanel
     bottomPanel = new JPanel();
     zoomInButton = new JButton();
     zoomOutButton = new JButton();
-    nbe = 0;
     try
     {
       jbInit();
@@ -195,7 +193,7 @@ public class CommandPanel
     Graphics2D g2d = null;
     if (gr instanceof Graphics2D)
       g2d = (Graphics2D)gr;
-    World.drawChart(chartPanel, gr, nbe, Color.RED);
+    World.drawChart(chartPanel, gr);
   }
 
   private void drawRhumbLine(Graphics2D g, double ls, double gs, double lf, 
@@ -264,8 +262,6 @@ public class CommandPanel
   {
     if (type == ChartPanel.MOUSE_CLICKED)
     {
-      nbe++;
-      System.out.println("Painting Section " + nbe);
       if (from == null)
         from = chartPanel.getGeoPos(((MouseEvent)e).getX(), ((MouseEvent)e).getY()); 
       else

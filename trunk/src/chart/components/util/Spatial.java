@@ -19,9 +19,30 @@ import org.w3c.dom.NodeList;
 
 public class Spatial
 {
-  private static final String XPath = "//Region/geometry//coordinates";
-//private static final String fileName = "CaliforniaCoast.xml";
-  private static String fileName = "bayArea.xml";
+  public enum Chart
+  {
+    WEST_COAST("US West Coast", "CaliforniaCoast.xml"),
+    BAY_AREA  ("SF Bay Area",   "bayArea.xml");
+
+    @SuppressWarnings("compatibility:-7549378910685392414")
+    public final static long serialVersionUID = 1L;
+
+    private final String label;
+    private final String resource;
+
+    Chart(String label, String resource)
+    {
+      this.label = label;
+      this.resource = resource;
+    }
+    
+    public String label() { return this.label; }
+    public String resource() { return this.resource; }
+  }
+    
+  private static final String XPATH = "//Region/geometry//coordinates";
+  
+  private String fileName = "CaliforniaCoast.xml"; // Default
   private NodeList nl;
 
   public Spatial()
@@ -29,10 +50,10 @@ public class Spatial
     nl = null;
   }
 
-  public Spatial(String fName)
+  public Spatial(Chart chart)
   {
     nl = null;
-    fileName = fName;
+    fileName = chart.resource();
   }
 
   public void drawChart(ChartPanelInterface cpi, Graphics gr)
@@ -55,7 +76,7 @@ public class Spatial
         DOMParser parser = new DOMParser();
         parser.parse(data);
         XMLDocument doc = parser.getDocument();
-        nl = doc.selectNodes("//Region/geometry//coordinates");
+        nl = doc.selectNodes(XPATH);
       }
       for(int i = 0; i < nl.getLength(); i++)
       {

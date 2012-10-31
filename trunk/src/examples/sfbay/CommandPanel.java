@@ -6,6 +6,8 @@ import astro.calc.GeoPoint;
 import chart.components.ui.ChartPanel;
 import chart.components.ui.ChartPanelParentInterface;
 import chart.components.util.Spatial;
+import chart.components.util.World;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -134,7 +136,8 @@ public class CommandPanel extends JPanel
   public void chartPanelPaintComponent(Graphics gr)
   {
     if(spatial == null)
-      spatial = new Spatial();
+      spatial = new Spatial(Spatial.Chart.BAY_AREA);
+    
     spatial.drawChart(chartPanel, gr);
     if(from != null && to != null)
     {
@@ -243,9 +246,9 @@ public class CommandPanel extends JPanel
   private JButton zoomOutButton;
   private JSlider zoomSlider;
   private JTextField zoomValueFld;
-  Spatial spatial;
-  GeoPoint from;
-  GeoPoint to;
+  private transient Spatial spatial;
+  private GeoPoint from;
+  private GeoPoint to;
 
 
   public void zoomFactorHasChanged(double d)
