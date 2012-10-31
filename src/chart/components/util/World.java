@@ -31,23 +31,13 @@ public class World
 {
   private static DOMParser parser = null;
   private static List<Polygon> lp = null;
-    
+  
   public static void drawChart(ChartPanelInterface cpi, Graphics gr)
   {
-    drawChart(cpi, gr, 0, null);
-  }
-
-  public static void drawChart(ChartPanelInterface cpi, Graphics gr, Color c)
-  {
-    drawChart(cpi, gr, 0, c);
-  }
-
-  public static void drawChart(ChartPanelInterface cpi, Graphics gr, int sect, Color c)
-  {
-    drawChart(null, cpi, gr, 0, c);
+    drawChart(null, cpi, gr);
   }
   
-  public static void drawChart(DOMParser p, ChartPanelInterface cpi, Graphics gr, int sect, Color c)
+  public static void drawChart(DOMParser p, ChartPanelInterface cpi, Graphics gr)
   {
     Color origColor = gr.getColor();
     try
