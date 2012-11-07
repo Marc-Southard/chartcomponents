@@ -2401,6 +2401,8 @@ public class ChartPanel
           xy = calculatePolarStereoGraphicXYCoordinates(lat, lng);
           x = (int)Math.round(stereoView_ratio * xy[0]);
           x += stereoViewOffset_X;
+          if (south < 0) // Southern hemisphere
+            x = w - x;
           break;
       }
       double incSouth = 0.0D;
@@ -2470,6 +2472,8 @@ public class ChartPanel
         case ChartPanelInterface.POLAR_STEREOGRAPHIC:
           incLat = lat;
           y = (int)(stereoViewOffset_Y - (int)incSouth);
+          if (south < 0) // Southern hemisphere
+            y = h + y;
           break;
       }
       pt = new Point(x, y);
