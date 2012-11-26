@@ -14,15 +14,21 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import java.text.DecimalFormat;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Vector;
+
+import javax.swing.DefaultFocusManager;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -46,6 +52,7 @@ public class CommandPanel
   private JButton zoomInButton;
   private JButton zoomOutButton;
   private JButton printButton;
+  private JButton undoButton;
   private JSlider zoomSlider;
   private JTextField zoomValueFld;
   private JLabel label = new JLabel("South Lat:");
@@ -66,11 +73,13 @@ public class CommandPanel
     chartPanel.setMouseDraggedEnabled(true);
 //  chartPanel.setMouseDraggedType(ChartPanel.MOUSE_DRAG_GRAB_SCROLL);
     chartPanel.setMouseDraggedType(ChartPanel.MOUSE_DRAW_ON_CHART);
+    
     bottomPanel = new JPanel();
     zoomInButton = new JButton();
     zoomOutButton = new JButton();
     updateButton = new JButton();
     printButton = new JButton();
+    undoButton = new JButton();
     sLatValueFld = new JTextField();
     zoomSlider = new JSlider();
     zoomValueFld = new JTextField();
@@ -119,7 +128,15 @@ public class CommandPanel
         update_actionPerformed(e);
       }
     });
-
+    undoButton.setText("Undo");
+    undoButton.setToolTipText("Undo last hand drawing");
+    undoButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        undo_actionPerformed(e);
+      }
+    });
     sLatValueFld.setText(Double.toString(sLat));
     sLatValueFld.setPreferredSize(new Dimension(40, 20));
     sLatValueFld.setHorizontalAlignment(4);
@@ -163,6 +180,7 @@ public class CommandPanel
     bottomPanel.add(sLatValueFld, null);
     bottomPanel.add(updateButton, null);
     bottomPanel.add(printButton, null);
+    bottomPanel.add(undoButton, null);
     bottomPanel.add(zoomSlider, null);
     bottomPanel.add(zoomValueFld, null);
     add(bottomPanel, BorderLayout.SOUTH);
@@ -206,6 +224,11 @@ public class CommandPanel
     {
       ex.printStackTrace();
     }
+  }
+    
+  private void undo_actionPerformed(ActionEvent e)
+  {
+    chartPanel.undoLastHandDrawing();
   }
   
   private void print_actionPerformed(ActionEvent e)

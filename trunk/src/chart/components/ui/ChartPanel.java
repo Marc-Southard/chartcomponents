@@ -1,9 +1,8 @@
 package chart.components.ui;
 
+
 import astro.calc.GeoPoint;
-
 import astro.calc.GreatCircle;
-
 import astro.calc.GreatCircleWayPoint;
 
 import chart.components.ui.gui.DistancePanel;
@@ -12,70 +11,63 @@ import chart.components.util.MercatorUtil;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Color;
-//import java.awt.event.InputEvent;
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Toolkit;
-import java.awt.Transparency;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.PixelGrabber;
 import java.awt.image.RenderedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
-
 import java.awt.print.PrinterJob;
 
 import java.io.File;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.OutputStream;
 
 import java.text.DecimalFormat;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.EventListener;
-
 import java.util.Iterator;
-
 import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
-import javax.swing.ImageIcon;
+import javax.swing.DefaultFocusManager;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ToolTipManager;
 import javax.swing.Scrollable;
+import javax.swing.ToolTipManager;
 
 import user.util.GeomUtil;
 
-@SuppressWarnings("serial")
+
 public class ChartPanel 
      extends JPanel
   implements Scrollable, 
@@ -86,6 +78,9 @@ public class ChartPanel
              MouseMotionListener, 
              Printable
 {
+  @SuppressWarnings("compatibility:-6850717583725046563")
+  private final static long serialVersionUID = 1L;
+  
   private int projection;
   
   public static final int NS = 0;
@@ -165,8 +160,10 @@ public class ChartPanel
   private boolean dragged;
   private Rectangle draggingRectangle;
   private transient List<Point> lineToDraw = null;
-  private transient ArrayList<ArrayList<GeoPoint>> handDrawing = null;
-  private transient ArrayList<GeoPoint> oneDrawing  = null;
+  private transient List<PointList<GeoPoint>> handDrawing = null;
+  private transient PointList<GeoPoint> oneDrawing  = null;
+  private boolean plotHandDrawing = true;
+  
   private double east;
   private double west;
   private double north;
@@ -265,10 +262,11 @@ public class ChartPanel
 
   private void jbInit()
         throws Exception
-  {
+  {    
     setLayout(null);
     addMouseListener(this);
     addMouseMotionListener(this);
+    
     ToolTipManager.sharedInstance().setInitialDelay(0);
     setToolTipText("This bubble gives the position");
 
@@ -771,12 +769,13 @@ public class ChartPanel
                                          BasicStroke.JOIN_BEVEL);
         ((Graphics2D)g).setStroke(stroke);  
       }
-      if (handDrawing != null)
+      if (handDrawing != null && plotHandDrawing)
       {
-        Iterator<ArrayList<GeoPoint>> iterator = handDrawing.iterator();
+        Iterator<PointList<GeoPoint>> iterator = handDrawing.iterator();
         while (iterator.hasNext())
         {
-          ArrayList<GeoPoint> al = iterator.next();
+          PointList<GeoPoint> al = iterator.next();
+          g.setColor(al.getLineColor());
           Iterator<GeoPoint> iterator2 = al.iterator();
           GeoPoint previous = null;
           while (iterator2.hasNext())
@@ -792,8 +791,9 @@ public class ChartPanel
           }
         }
       }
-      if (/*dragged && */oneDrawing != null) // Current one
+      if (/*dragged && */oneDrawing != null && plotHandDrawing) // Current one
       {
+        g.setColor(drawColor);
         Iterator iterator3 = oneDrawing.iterator();
         GeoPoint previous = null;
         while (iterator3.hasNext())
@@ -871,6 +871,15 @@ public class ChartPanel
       String three = "Great Circle:" + Integer.toString((int)(Math.toDegrees(gc.getDistance()) * 60.0)) + "'";
       postit(g, one + "\n" + two + "\n" + three, p2.x, p2.y, Color.blue, Color.white, 0.75f);     
     }    
+  }
+  
+  public void undoLastHandDrawing()
+  {
+    if (handDrawing != null && handDrawing.size() > 0)
+    {
+      handDrawing.remove(handDrawing.size() - 1);
+      repaint();
+    }
   }
 
   public void redrawGrid(Graphics g)
@@ -3128,7 +3137,7 @@ public class ChartPanel
       if (dragged && mouseDraggedType == MOUSE_DRAW_ON_CHART)
       {
         if (handDrawing == null)
-          handDrawing = new ArrayList<ArrayList<GeoPoint>>(10);
+          handDrawing = new ArrayList<PointList<GeoPoint>>(10);
         handDrawing.add(oneDrawing);
         oneDrawing = null;
       }
@@ -3234,8 +3243,11 @@ public class ChartPanel
       if (parent.onEvent(e, ChartPanel.MOUSE_DRAGGED))
       {
         dragged = true;
-        if (oneDrawing == null)     
-          oneDrawing = new ArrayList<GeoPoint>(10);
+        if (oneDrawing == null)  
+        {
+          oneDrawing = new PointList<GeoPoint>(10);
+          oneDrawing.setLineColor(drawColor); 
+        }
         GeoPoint dpt = getGeoPos(e.getX(), e.getY());
   //    System.out.println("Point " + dpt.toString());
         oneDrawing.add(dpt);
@@ -3659,19 +3671,19 @@ public class ChartPanel
     return drawThickness;
   }
 
-  public void setHandDrawing(ArrayList<ArrayList<GeoPoint>> handDrawing)
+  public void setHandDrawing(List<PointList<GeoPoint>> handDrawing)
   {
     this.handDrawing = handDrawing;
     if (handDrawing == null)
       oneDrawing = null;
   }
 
-  public ArrayList<ArrayList<GeoPoint>> getHandDrawing()
+  public List<PointList<GeoPoint>> getHandDrawing()
   {
     return handDrawing;
   }
 
-  public void setOneDrawing(ArrayList<GeoPoint> oneDrawing)
+  public void setOneDrawing(PointList<GeoPoint> oneDrawing)
   {
     this.oneDrawing = oneDrawing;
   }
@@ -3767,6 +3779,16 @@ public class ChartPanel
     return mouseEdgeProximityDetectionEnabled;
   }
 
+  public void setPlotHandDrawing(boolean plotHandDrawing)
+  {
+    this.plotHandDrawing = plotHandDrawing;
+  }
+
+  public boolean isPlotHandDrawing()
+  {
+    return plotHandDrawing;
+  }
+
   public class NotOnChartException extends Exception
   {
     public NotOnChartException(String str)
@@ -3858,5 +3880,44 @@ public class ChartPanel
       newZ = rotated[2];
     }      
     System.out.println("X:" + newX + ", Y:" + newY + ", newZ:" + newZ);
+  }
+  
+  public static class PointList<T> extends ArrayList<T>
+  {
+    @SuppressWarnings("compatibility:8215775402129893116")
+    private final static long serialVersionUID = 1L;
+    
+    private Color lineColor = Color.red;
+    
+    public PointList(Collection<T> c)
+    {
+      super(c);
+    }
+
+    public PointList(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+
+    public PointList()
+    {
+      super();
+    }
+
+    public PointList(Color c)
+    {
+      super();
+      this.lineColor = c;
+    }
+
+    public void setLineColor(Color lineColor)
+    {
+      this.lineColor = lineColor;
+    }
+
+    public Color getLineColor()
+    {
+      return lineColor;
+    }
   }
 }
