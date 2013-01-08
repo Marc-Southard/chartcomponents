@@ -3,28 +3,22 @@ package chart.components.util;
 import astro.calc.GeoPoint;
 
 import chart.components.ui.ChartPanelInterface;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-//import java.io.PrintStream;
 import java.awt.Polygon;
-
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.Area;
 
-import java.awt.geom.Line2D;
-
 import java.util.ArrayList;
-
 import java.util.List;
 
+import oracle.xml.parser.v2.DOMParser;
 import oracle.xml.parser.v2.XMLDocument;
 import oracle.xml.parser.v2.XMLElement;
-import oracle.xml.parser.v2.DOMParser;
-//import org.w3c.dom.Node;
+
 import org.w3c.dom.NodeList;
 
 public class World
@@ -70,7 +64,7 @@ public class World
       for (int i = 0; i < nl.getLength(); i++)
       {
         gr.setColor(origColor);
-//        if(c != null && i == sect)
+//        if (c != null && i == sect)
 //        {
 //          System.out.println("Section " + sect + " in RED");
 //          gr.setColor(c);
@@ -171,7 +165,12 @@ public class World
     {
       java.net.URL data = World.class.getResource("data.xml");
       if (parser == null)
-        parser = new DOMParser();
+      {
+        if (p == null)
+          parser = new DOMParser();
+        else
+          parser = p;
+      }
       parser.parse(data);
       XMLDocument doc = parser.getDocument();
       NodeList nl = doc.selectNodes("//section");
@@ -395,7 +394,7 @@ public class World
                           fromY + (int)(i * ((double)height / NB_ITERATION)));
       if (poly.contains(p.x, p.y))
       {
-        GeoPoint gp = new GeoPoint((double)p.y / 1000D, (double)p.x / 1000D);
+//        GeoPoint gp = new GeoPoint((double)p.y / 1000D, (double)p.x / 1000D);
 //        System.out.print(" (i=" + i + ", " + gp.toString() + ") ");
 //        System.out.print(" fromX:" + fromX + ", fromY:" + fromY + ", w:" + width + ", h:" + height + " ");
 //        System.out.print("FromPt:" + from + ", ToPt:" + to + " CurrPt:" + p + " ");
